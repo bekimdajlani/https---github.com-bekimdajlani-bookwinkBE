@@ -194,6 +194,7 @@ exports.changePassword = (req, res) => {
 exports.forgotpassword = (req, res) => {
 
     const { email } = req.body;
+    const csrfToken = req.csrfToken();
 
     console.log(req.body);
 
@@ -209,7 +210,7 @@ exports.forgotpassword = (req, res) => {
         console.log(recipient);
         const token = jwt.sign({ userId: results[0].id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
 
-        pool.query('INSERT INTO tokens SET? ', { id: results[0].id, reset_token: token, email: email })
+        pool.query('INSERT INTO tokens SET? ', { id: results[0].id, reset_token: token, email: email, csrfToken : csrfToken })
 
         const resetlink = `http://localhost:3000/resetpassword?token=${token}`;
 

@@ -22,7 +22,7 @@ const pool = mysql.createPool({
 
 });
 
-const transporter = nodemailer.createTransport(
+const transporter = nodemailer.createTransport( 
     smtpTransport({
         host: 'smtp.mail.yahoo.com',
         port: 587,

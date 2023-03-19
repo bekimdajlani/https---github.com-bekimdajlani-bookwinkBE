@@ -1,39 +1,37 @@
 const express = require('express');
 const router = express.Router();
-const csrf = require('csurf');
-const csrfProtection = csrf({ cookie: true });
 
 router.get('/', (req, res) => {
     res.render('index');
 });
 
-router.get('/register', csrfProtection ,(req, res) => {
-    res.render('register',{csfrToken : req.csrfToken()});
+router.get('/register',(req, res) => {
+    res.render('register');
 });
 
-router.get('/login', csrfProtection ,(req, res) => {
-    res.render('login',{csfrToken : req.csrfToken()});
+router.get('/login',(req, res) => {
+    res.render('login');
     
 });
 
-router.get('/changePassword', csrfProtection ,(req, res) => {
-    res.render('changePassword',{csfrToken : req.csrfToken()});
+router.get('/changePassword',(req, res) => {
+    res.render('changePassword');
 });
 
-router.get('/forgotpassword',csrfProtection , (req, res) => {
-    res.render('forgotpassword',{csfrToken : req.csrfToken()});
+router.get('/forgotpassword', (req, res) => {
+    res.render('forgotpassword');
 });
 
-router.get('/resetpassword', csrfProtection ,(req, res) => {
+router.get('/resetpassword',(req, res) => {
     const token = req.query.token;
     if (!token) {
         return res.status(400).send('Bad request');
     }
-    res.render('resetpassword',{csfrToken : req.csrfToken()});
+    res.render('resetpassword');
 });
 
-router.get('/logout', csrfProtection ,(req, res) => {
-    res.render('login',{csfrToken : req.csrfToken()});
+router.get('/logout',(req, res) => {
+    res.render('login');
 });
 
 module.exports = router;

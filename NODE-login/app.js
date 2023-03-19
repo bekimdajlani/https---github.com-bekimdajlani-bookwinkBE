@@ -4,7 +4,6 @@ const dotenv = require('dotenv');
 const path = require('path');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-const csrf = require('csurf');
 
 
 
@@ -29,9 +28,6 @@ const publicDirectory = path.join(__dirname, './public');
 app.use(express.static(publicDirectory));
 app.use(cookieParser());
 app.use(cors());
-app.use(csrf({ cookie: true }));
-const csrfProtection = csrf({ cookie: true });
-app.use(csrfProtection);
 //to grab the data from any form
 app.use(express.urlencoded({extended: false}))
 //the values that we are grabbing from the form are json

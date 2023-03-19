@@ -301,11 +301,7 @@ exports.reservation = async (req, res) => {
 
 exports.logout = (req, res) => {
 
-    // const token = req.body.token;
-    // if (req.csrfToken() !== token) {
-    //     res.status(403).send('Invalid CSRF token');
-    //     return;
-    // }
+
 
     // if (token) {
     //     res.clearCookie('jwt');

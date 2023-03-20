@@ -38,24 +38,24 @@ const transporter = nodemailer.createTransport(
 );
 
 // TO BE DONE FOR SECURITY
-// const jwt = require('jsonwebtoken');
+ 
 
-// function authenticateToken(req, res, next) {
-//   const authHeader = req.headers['authorization'];
-//   const token = authHeader && authHeader.split(' ')[1];
+exports.authToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+   const token = authHeader && authHeader.split(' ')[1];
   
-//   if (!token) {
-//     return res.status(401).send('Missing token');
-//   }
+   if (!token) {
+     return res.status(401).send('Missing token');
+   }
 
-//   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-//     if (err) {
-//       return res.status(403).send('Invalid token');
-//     }
-//     req.user = user;
-//     next();
-//   });
-// }
+   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+     if (err) {
+       return res.status(403).send('Invalid token');
+     }
+     req.user = user;
+     next();
+   });
+ }
 
 
 exports.register = (req, res) => {

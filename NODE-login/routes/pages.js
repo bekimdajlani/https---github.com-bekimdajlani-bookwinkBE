@@ -1,5 +1,5 @@
 const express = require('express');
-const { authToken } = require('../controllers/auth');
+const { authenticateToken} = require('../controllers/auth');
 const router = express.Router();
 
 router.get('/', (req, res) => {
@@ -15,7 +15,7 @@ router.get('/login',(req, res) => {
     
 });
 
-router.get('/changePassword',authToken,(req, res) => {
+router.get('/changePassword',authenticateToken,(req, res) => {
     res.render('changePassword');
 });
 
@@ -23,11 +23,11 @@ router.get('/forgotpassword', (req, res) => {
     res.render('forgotpassword');
 });
 
-router.get('/resetpassword',authToken,(req, res) => {
+router.get('/resetpassword',authenticateToken,(req, res) => {
     res.render('resetpassword');
 });
 
-router.get('/logout',authToken,(req, res) => {
+router.get('/logout',authenticateToken,(req, res) => {
     res.render('login');
 });
 

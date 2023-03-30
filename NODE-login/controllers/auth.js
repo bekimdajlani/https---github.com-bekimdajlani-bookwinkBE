@@ -6,12 +6,6 @@ const cookieParser = require('cookie');
 const smtpTransport = require('nodemailer-smtp-transport');
 
 
-// const pool = mysql.createConnection({
-//     host: process.env.DATABASE_HOST,
-//     user: process.env.DATABASE_USER,
-//     password: process.env.DATABASE_PASSWORD,
-//     database: process.env.DATABASE
-// });
 
 const pool = mysql.createPool({
     connectionLimit: 10,
@@ -22,7 +16,7 @@ const pool = mysql.createPool({
 
 });
 
-const transporter = nodemailer.createTransport( 
+const transporter = nodemailer.createTransport(
     smtpTransport({
         host: 'smtp.mail.yahoo.com',
         port: 587,
@@ -37,33 +31,36 @@ const transporter = nodemailer.createTransport(
     })
 );
 
-// TO BE DONE FOR SECURITY
-// const jwt = require('jsonwebtoken');
+exports.authenticateToken = (req, res, next) => {
 
-// function authenticateToken(req, res, next) {
-//   const authHeader = req.headers['authorization'];
-//   const token = authHeader && authHeader.split(' ')[1];
-  
-//   if (!token) {
-//     return res.status(401).send('Missing token');
-//   }
+    const user = req.user;
+    const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET)
+    res.json({ accessToken: accessToken })
+    console.log(`THIS IS ACCESS TOKEN ${accessToken}`);
 
-//   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-//     if (err) {
-//       return res.status(403).send('Invalid token');
-//     }
-//     req.user = user;
-//     next();
-//   });
-// }
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).send('Missing token');
+    }
+
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+        if (err) {
+            return res.status(403).send('Invalid token');
+        }
+        req.user = user;
+        next();
+    });
+}
 
 
 exports.register = (req, res) => {
     try {
-        
-        
+
+
         const { name, email, password, passwordConfirm } = req.body;
-        
+
         pool.query('SELECT email FROM users WHERE email = ?', [email], async (error, results) => {
             if (error) {
                 console.log(error);
@@ -78,10 +75,10 @@ exports.register = (req, res) => {
                     message: 'Passwords do not match'
                 });
             }
-            
+
             let hashedPassword = await bcrypt.hash(password, 8);
             console.log(hashedPassword);
-            
+
             pool.query('INSERT INTO users SET ?', { username: name, email: email, password: hashedPassword }, (error, results) => {
                 if (error) {
                     console.log(error);

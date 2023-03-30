@@ -1,4 +1,5 @@
 const express = require('express');
+const { authToken } = require('../controllers/auth');
 const router = express.Router();
 
 router.get('/', (req, res) => {
@@ -14,7 +15,7 @@ router.get('/login',(req, res) => {
     
 });
 
-router.get('/changePassword',(req, res) => {
+router.get('/changePassword',authToken,(req, res) => {
     res.render('changePassword');
 });
 
@@ -22,15 +23,11 @@ router.get('/forgotpassword', (req, res) => {
     res.render('forgotpassword');
 });
 
-router.get('/resetpassword',(req, res) => {
-    const token = req.query.token;
-    if (!token) {
-        return res.status(400).send('Bad request');
-    }
+router.get('/resetpassword',authToken,(req, res) => {
     res.render('resetpassword');
 });
 
-router.get('/logout',(req, res) => {
+router.get('/logout',authToken,(req, res) => {
     res.render('login');
 });
 

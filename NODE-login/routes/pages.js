@@ -19,7 +19,7 @@ router.get('/changePassword',authenticateToken,(req, res) => {
     res.render('changePassword');
 });
 
-router.get('/forgotpassword', (req, res) => {
+router.get('/forgotpassword', authenticateToken, (req, res) => {
     res.render('forgotpassword');
 });
 

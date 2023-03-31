@@ -50,6 +50,7 @@ exports.authenticateToken = (req, res, next) => {
             return res.status(403).send('Invalid token');
         }
         req.user = user;
+        res.json("I AM WORKING");
         next();
     });
 }

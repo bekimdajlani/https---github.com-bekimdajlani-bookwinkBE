@@ -59,9 +59,8 @@ exports.authenticateToken = (req, res, next) => {
 exports.register = (req, res) => {
     try {
 
-
-        const { name, email, password, passwordConfirm } = req.body;
-
+        const { firstname, lastname, username, email, password, passwordConfirm } = req.body;
+        console.log(req.body);
         pool.query('SELECT email FROM users WHERE email = ?', [email], async (error, results) => {
             if (error) {
                 console.log(error);
@@ -80,7 +79,7 @@ exports.register = (req, res) => {
             let hashedPassword = await bcrypt.hash(password, 8);
             console.log(hashedPassword);
 
-            pool.query('INSERT INTO users SET ?', { username: name, email: email, password: hashedPassword }, (error, results) => {
+            pool.query('INSERT INTO users SET ?', { username: username, email: email, password: hashedPassword, firstName: firstname, lastName: lastname }, (error, results) => {
                 if (error) {
                     console.log(error);
                     return res.json({
@@ -89,8 +88,7 @@ exports.register = (req, res) => {
                 } else {
                     console.log(results);
                     return res.json({
-                        results,
-                        message: 'User registered'
+                        message: 'User registered go to login page to login',
                     });
                 }
             });
@@ -148,7 +146,8 @@ exports.login = (req, res) => {
                 res.cookie('jwt', token, cookieOptions);
                 // res.status(200).redirect("/");
                 return res.json({
-                    message: 'User logged in'
+                    message: 'User logged in',
+                    user: results
                 });
             }
 

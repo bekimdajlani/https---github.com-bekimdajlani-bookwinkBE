@@ -6,7 +6,6 @@ const cookieParser = require('cookie');
 const smtpTransport = require('nodemailer-smtp-transport');
 
 
-
 const pool = mysql.createPool({
     connectionLimit: 10,
     host: process.env.DATABASE_HOST,
@@ -55,12 +54,11 @@ exports.authenticateToken = (req, res, next) => {
     });
 }
 
-
 exports.register = (req, res) => {
     try {
 
         const { firstname, lastname, username, email, password, passwordConfirm } = req.body;
-        console.log(req.body);
+        
         pool.query('SELECT email FROM users WHERE email = ?', [email], async (error, results) => {
             if (error) {
                 console.log(error);
@@ -100,7 +98,6 @@ exports.register = (req, res) => {
 
     }
 };
-
 
 exports.login = (req, res) => {
     try {
@@ -213,8 +210,6 @@ exports.forgotpassword = (req, res) => {
 
     const { email } = req.body;
 
-    console.log(req.body);
-
     pool.query('SELECT * FROM users WHERE email = ?', [email], (error, results) => {
 
         if (results.length === 0) {
@@ -230,8 +225,6 @@ exports.forgotpassword = (req, res) => {
         pool.query('INSERT INTO tokens SET? ', { id: results[0].id, reset_token: token, email: email })
 
         const resetlink = `http://localhost:3000/resetpassword?token=${token}`;
-
-        console.log(resetlink);
 
         const mailOptions = {
             from: process.env.EMAILSENDER,
@@ -249,13 +242,10 @@ exports.forgotpassword = (req, res) => {
             }
             console.log(`Email sent:${info}`);
             return res.json({ message: 'Email sent' });
-
         });
-
     });
 
 }
-
 
 exports.resetpassword = async (req, res) => {
     try {
@@ -286,9 +276,7 @@ exports.resetpassword = async (req, res) => {
                 console.log(results);
                 return res.status(200).json({ message: 'Password reset success' });
             }
-
         });
-
     }
     catch (error) {
         console.log(error);
@@ -296,8 +284,7 @@ exports.resetpassword = async (req, res) => {
     }
 }
 
-
-exports.reservation = async (req, res) => {
+exports.hotelBook = async (req, res) => {
 
     const { mybookings } = req.body;
     const userId = req.params.id;
@@ -312,19 +299,32 @@ exports.reservation = async (req, res) => {
         } else {
             res.json(results);
         }
-
-
     });
 }
 
 exports.logout = (req, res) => {
 
+// Function to delete a cookie by setting its maxAge to 0
+const deleteCookie = (res, name) => {
+  res.setHeader('Set-Cookie', cookie.serialize(name, '', {
+    maxAge: 0, // Set maxAge to 0 to delete the cookie
+    path: '/',
+  }));
+}
+
+// Example usage in an Express route handler for logging out
+app.get('/logout', (req, res) => {
+  // Delete the 'jwt' cookie
+  // Clear the JWT token
+  // use localStorage or sessionStorage in the browser to store the token and then remove it when logging out
+  // clear the token from localStorage:
+  // localStorage.removeItem('jwtToken');
+  // Redirect to the login page or perform any other desired action
+});
 
 
-    // if (token) {
-    //     res.clearCookie('jwt');
-    //     res.redirect('/login');
-    // } else {
-    //     res.redirect('/');
-    // }
+    return res.json({
+        message: "working user logged out",
+        resultd : `${res.cookie('jwt',token,cookieOptions)}`
+    })
 };

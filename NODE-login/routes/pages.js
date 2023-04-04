@@ -12,10 +12,9 @@ router.get('/register',(req, res) => {
 
 router.get('/login',(req, res) => {
     res.render('login');
-    
 });
 
-router.get('/changePassword',authenticateToken,(req, res) => {
+router.get('/changePassword',(req, res) => {
     res.render('changePassword');
 });
 
@@ -27,8 +26,10 @@ router.get('/resetpassword',authenticateToken,(req, res) => {
     res.render('resetpassword');
 });
 
-router.get('/logout',authenticateToken,(req, res) => {
+router.get('/logout' ,(req, res) => {
+    deleteCookie(res, 'jwt');
     res.render('login');
 });
+
 
 module.exports = router;

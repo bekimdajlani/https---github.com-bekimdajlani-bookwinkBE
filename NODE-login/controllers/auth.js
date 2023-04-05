@@ -4,6 +4,8 @@ const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const cookieParser = require('cookie');
 const smtpTransport = require('nodemailer-smtp-transport');
+const { query } = require('express');
+const { error } = require('console');
 
 
 const pool = mysql.createPool({
@@ -58,7 +60,7 @@ exports.register = (req, res) => {
     try {
 
         const { firstname, lastname, username, email, password, passwordConfirm } = req.body;
-        
+
         pool.query('SELECT email FROM users WHERE email = ?', [email], async (error, results) => {
             if (error) {
                 console.log(error);
@@ -304,27 +306,74 @@ exports.hotelBook = async (req, res) => {
 
 exports.logout = (req, res) => {
 
-// Function to delete a cookie by setting its maxAge to 0
-const deleteCookie = (res, name) => {
-  res.setHeader('Set-Cookie', cookie.serialize(name, '', {
-    maxAge: 0, // Set maxAge to 0 to delete the cookie
-    path: '/',
-  }));
-}
+    // Function to delete a cookie by setting its maxAge to 0
+    function deleteCookie(res, name) {
+        res.setHeader('Set-Cookie', cookie.serialize(name, '', {
+            maxAge: 0,
+            path: '/',
+        }));
+    }
 
-// Example usage in an Express route handler for logging out
-app.get('/logout', (req, res) => {
-  // Delete the 'jwt' cookie
-  // Clear the JWT token
-  // use localStorage or sessionStorage in the browser to store the token and then remove it when logging out
-  // clear the token from localStorage:
-  // localStorage.removeItem('jwtToken');
-  // Redirect to the login page or perform any other desired action
-});
-
+    // Example usage in an Express route handler for logging out
 
     return res.json({
         message: "working user logged out",
-        resultd : `${res.cookie('jwt',token,cookieOptions)}`
+        result: `${res.cookie('jwt', token, cookieOptions)}`
     })
+};
+
+
+exports.booking = async (req, res) => {
+
+    const { Hotel_ID, checkInDate, checkOutDate, Board, Room_ID, numGuests, Res_Name, Res_details, Res_status } = req.body;
+    const userId = req.user.id;
+    const reservationSql = 'INSERT INTO reservations (User_ID,Res_Name,Res_details,Res_status) VALUES (?, ?, ?, ?)';
+    const reservationValues = [userId, Res_Name, Res_details, Res_status];
+    const sql = 'INSERT INTO hotel (user_id, Hotel_ID, check_in_date, check_out_date, room_type, num_guests) VALUES (?, ?, ?, ?, ?, ?)';
+    const values = [userId, Hotel_ID, checkInDate, checkOutDate, Board, numGuests];
+
+    try {
+        const reservationResult = await new Promise((resolve, reject) => {
+            pool.query(reservationSql, reservationValues, (error, results) => {
+                if (error) {
+                    reject(error);
+                }
+                resolve(results);
+            });
+        });
+
+        const reservationId = reservationResult.insertId;
+
+        const hotelResult = await new Promise((resolve, reject) => {
+            pool.query(sql, values, (error, results) => {
+                if (error) {
+                    reject(error);
+                }
+                resolve(results);
+            });
+        });
+
+        const hotelId = hotelResult.insertId;
+
+        const serviceSql = 'INSERT INTO Service (reservation_id, Hotel_ID) VALUES (?, ?)';
+        const serviceValues = [reservationId, hotelId];
+        const serviceResult = await new Promise((resolve, reject) => {
+            pool.query(serviceSql, serviceValues, (error, results) => {
+                if (error) {
+                    reject(error);
+                }
+                resolve(results);
+            });
+        });
+
+        return res.json({
+            message: "Booking completed successfully",
+            results: [reservationResult, hotelResult, serviceResult]
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: "An error occurred while processing the booking"
+        });
+    }
 };

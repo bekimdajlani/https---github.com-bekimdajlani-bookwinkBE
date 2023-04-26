@@ -6,6 +6,7 @@ const cookieParser = require('cookie');
 const smtpTransport = require('nodemailer-smtp-transport');
 const { query } = require('express');
 const { error } = require('console');
+const { errorMonitor } = require('events');
 
 
 const pool = mysql.createPool({
@@ -333,16 +334,19 @@ exports.booking = async (req, res) => {
     const values = [userId, Hotel_ID, checkInDate, checkOutDate, Board, numGuests];
 
     try {
-        const reservationResult = await new Promise((resolve, reject) => {
+        const reservationResult = ((req, res) => {
             pool.query(reservationSql, reservationValues, (error, results) => {
                 if (error) {
-                    reject(error);
+                    res.status(404).json({message:"first promise"});
+                    console.log(error);
                 }
-                resolve(results);
+                res.json(results);
+                console.log(results);
             });
         });
 
         const reservationId = reservationResult.insertId;
+        console.log(reservationId);
 
         const hotelResult = await new Promise((resolve, reject) => {
             pool.query(sql, values, (error, results) => {

@@ -9,6 +9,7 @@ router.get('/logout', authController.logout);
 router.post('/changePassword',authController.changePassword);
 router.post('/forgotpassword',authController.forgotpassword);
 router.post('/resetpassword',authController.resetpassword);
+router.post('./hotelbooking',authController.booking);
 
 
 

@@ -26,6 +26,14 @@ router.get('/resetpassword',authenticateToken,(req, res) => {
     res.render('resetpassword');
 });
 
+// router.get('/hotelbooking',((req,res)=>{
+
+//     res.json({
+//         message:"I work"
+//     })
+  
+//  }));
+
 router.get('/logout' ,(req, res) => {
     deleteCookie(res, 'jwt');
     res.render('login');
